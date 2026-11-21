@@ -502,25 +502,25 @@
                     </div>
                 </div>
 
-                <!-- Sub-navegação interna do Segundo Cérebro: Insights | Plano de Ação | PAHA -->
-                <div class="inline-flex flex-wrap p-1 rounded-2xl bg-slate-950/90 border border-slate-800 gap-1" id="second-brain-subnav">
-                    <button onclick="setSecondBrainSubtab('insights')" id="sb-btn-insights" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition flex items-center gap-1.5">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                        Meus Insights
+                <!-- Random Review Spotlight Box (Hidden by default) -->
+                <div id="random-review-box" class="hidden rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/10 to-slate-800 border border-amber-500/40 p-5 relative">
+                    <button onclick="document.getElementById('random-review-box').classList.add('hidden')" class="absolute top-3.5 right-3.5 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="setSecondBrainSubtab('action-plan')" id="sb-btn-action-plan" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-1.5">
-                        <i data-lucide="target" class="w-3.5 h-3.5"></i>
-                        Plano de Ação
-                        <span id="sb-action-badge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-amber-400">0</span>
-                    </button>
-                    <button onclick="setSecondBrainSubtab('paha')" id="sb-btn-paha" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-1.5">
-                        <i data-lucide="folder-kanban" class="w-3.5 h-3.5"></i>
-                        PAHA
-                    </button>
+                    <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        Revisão Espaçada — Relembre este aprendizado
+                    </div>
+                    <div id="random-review-content"></div>
                 </div>
 
-                <!-- SUB-SEÇÃO 4A: MEUS INSIGHTS (COSMOS) -->
-                <div id="sb-panel-insights" class="space-y-6">
+                <!-- Filters -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="insight-search" oninput="renderInsights()" placeholder="Buscar nota ou #tag..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-500">
+                    </div>
+                    <select id="insight-book-filter" onchange="renderInsights()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
                         <option value="all">Todos os Livros</option>
                     </select>
                     <select id="insight-type-filter" onchange="renderInsights()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
@@ -535,107 +535,6 @@
                 <!-- Insights List -->
                 <div id="insights-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Preenchido via JS -->
-                </div>
-                </div>
-
-                <!-- SUB-SEÇÃO 4B: PLANO DE AÇÃO -->
-                <div id="sb-panel-action-plan" class="hidden space-y-5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-slate-800/70 border border-slate-700/70 p-4 sm:p-5">
-                        <div>
-                            <div class="text-xs font-semibold text-amber-400 mb-0.5">← Segundo Cérebro</div>
-                            <h3 class="text-xl font-bold text-white">Plano de Ação</h3>
-                            <p class="text-xs sm:text-sm text-slate-400">Transforme seus aprendizados em ações práticas (+15 XP ao concluir cada ação).</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-700/70 self-start">
-                            <button onclick="setActionFilter('all')" data-action-filter="all" class="action-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950">Todas</button>
-                            <button onclick="setActionFilter('pending')" data-action-filter="pending" class="action-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white">Pendentes</button>
-                            <button onclick="setActionFilter('done')" data-action-filter="done" class="action-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white">Concluídas</button>
-                        </div>
-                    </div>
-
-                    <div id="action-plans-container" class="space-y-3">
-                        <!-- Preenchido via JS -->
-                    </div>
-                </div>
-
-                <!-- SUB-SEÇÃO 4C: PAHA (PROJETOS, ÁREAS, HABILIDADES E ACERVO) -->
-                <div id="sb-panel-paha" class="hidden space-y-6">
-                    <div class="rounded-2xl bg-slate-800/70 border border-slate-700/70 p-4 sm:p-5">
-                        <div class="text-xs font-semibold text-amber-400 mb-0.5">← Segundo Cérebro</div>
-                        <h3 class="text-xl font-bold text-white">PAHA</h3>
-                        <p class="text-xs sm:text-sm text-slate-400">Organize seus conhecimentos em Projetos, Áreas, Habilidades e Acervo.</p>
-                    </div>
-
-                    <!-- PROJETOS -->
-                    <div class="rounded-2xl bg-slate-800/80 border border-slate-700/70 p-5 space-y-3.5">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
-                                    <i data-lucide="folder" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm uppercase tracking-wide text-white">Projetos</h4>
-                                    <p class="text-xs text-slate-400">Objetivos com início, desenvolvimento e conclusão.</p>
-                                </div>
-                            </div>
-                            <button onclick="openPahaModal('projects')" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white flex items-center gap-1 shrink-0 transition">
-                                <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-400"></i> Novo
-                            </button>
-                        </div>
-                        <div id="paha-list-projects" class="space-y-2.5"></div>
-                    </div>
-
-                    <!-- ÁREAS -->
-                    <div class="rounded-2xl bg-slate-800/80 border border-slate-700/70 p-5 space-y-3.5">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
-                                    <i data-lucide="layers" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm uppercase tracking-wide text-white">Áreas</h4>
-                                    <p class="text-xs text-slate-400">Responsabilidades contínuas, sem uma conclusão definida.</p>
-                                </div>
-                            </div>
-                            <button onclick="openPahaModal('areas')" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white flex items-center gap-1 shrink-0 transition">
-                                <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-400"></i> Novo
-                            </button>
-                        </div>
-                        <div id="paha-list-areas" class="space-y-2.5"></div>
-                    </div>
-
-                    <!-- HABILIDADES -->
-                    <div class="rounded-2xl bg-slate-800/80 border border-slate-700/70 p-5 space-y-3.5">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                                    <i data-lucide="library-big" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-sm uppercase tracking-wide text-white">Habilidades</h4>
-                                    <p class="text-xs text-slate-400">Habilidades e referências úteis para consulta e prática.</p>
-                                </div>
-                            </div>
-                            <button onclick="openPahaModal('skills')" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white flex items-center gap-1 shrink-0 transition">
-                                <i data-lucide="plus" class="w-3.5 h-3.5 text-amber-400"></i> Novo
-                            </button>
-                        </div>
-                        <div id="paha-list-skills" class="space-y-2.5"></div>
-                    </div>
-
-                    <!-- ACERVO -->
-                    <div class="rounded-2xl bg-slate-800/60 border border-slate-700/60 p-5 space-y-3.5">
-                        <div class="flex items-start gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-                                <i data-lucide="archive" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-sm uppercase tracking-wide text-white">Acervo</h4>
-                                <p class="text-xs text-slate-400">Itens arquivados. Nada é excluído: restaure quando precisar.</p>
-                            </div>
-                        </div>
-                        <div id="paha-list-archive" class="space-y-2.5"></div>
-                    </div>
                 </div>
             </section>
 
@@ -936,78 +835,6 @@
         </div>
     </div>
 
-    <!-- Modal: Transformar Insight em Plano de Ação -->
-    <div id="action-plan-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl my-auto">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i data-lucide="target" class="w-5 h-5 text-amber-400"></i>
-                    Criar Plano de Ação
-                </h3>
-                <button onclick="closeModal('action-plan-modal')" class="text-slate-400 hover:text-white p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div id="action-source-insight-preview" class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/70 text-xs text-slate-300 italic mb-4"></div>
-            <form onsubmit="saveActionPlanForm(event)" class="space-y-4">
-                <input type="hidden" id="action-source-insight-id">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Ação Prática *</label>
-                    <textarea id="action-plan-title" rows="3" required placeholder="Ex: Ler 15 minutos antes de dormir deixando o celular em outro cômodo..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Frequência / Prazo (Opcional)</label>
-                    <input type="text" id="action-plan-cadence" placeholder="Ex: Todos os dias, Esta semana..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                    <button type="button" onclick="closeModal('action-plan-modal')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Cancelar</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold">Adicionar ao Plano de Ação</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Novo Item PAHA -->
-    <div id="paha-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl my-auto">
-            <div class="flex items-center justify-between mb-4">
-                <h3 id="paha-modal-title" class="text-lg font-bold text-white">Novo Item no PAHA</h3>
-                <button onclick="closeModal('paha-modal')" class="text-slate-400 hover:text-white p-1">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <form onsubmit="savePahaItemForm(event)" class="space-y-4">
-                <input type="hidden" id="paha-item-category">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nome / Título *</label>
-                    <input type="text" id="paha-item-name" required placeholder="Ex: Criar rotina de leitura noturna" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Notas / Referências / Critério de Conclusão</label>
-                    <textarea id="paha-item-notes" rows="3" placeholder="Detalhes, próximos passos ou referências de consulta..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Vincular a Livro (Opcional)</label>
-                        <select id="paha-item-book" class="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-500">
-                            <option value="">Nenhum livro</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Vincular a Insight (Opcional)</label>
-                        <select id="paha-item-insight" class="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-500">
-                            <option value="">Nenhum insight</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                    <button type="button" onclick="closeModal('paha-modal')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Cancelar</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold">Salvar no PAHA</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal: Configurar Metas -->
     <div id="goals-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
@@ -1052,8 +879,6 @@
             books: [],
             sessions: [],
             insights: [],
-            actionPlans: [],
-            pahaItems: [],
             goals: {
                 dailyPages: 20,
                 annualBooks: 12
@@ -1063,8 +888,6 @@
 
         // Estado de UI & Cronômetro
         let currentTab = 'inicio';
-        let currentSecondBrainSubtab = 'insights';
-        let currentActionFilter = 'all';
         let currentShelfFilter = 'all';
         let timerInterval = null;
         let timerSeconds = 0;
@@ -1217,8 +1040,6 @@
                         books: parsed.books || [],
                         sessions: parsed.sessions || [],
                         insights: parsed.insights || [],
-                        actionPlans: parsed.actionPlans || [],
-                        pahaItems: parsed.pahaItems || [],
                         goals: parsed.goals || { dailyPages: 20, annualBooks: 12 },
                         bonusXP: parsed.bonusXP || 0
                     };
@@ -1245,9 +1066,9 @@
             const totalMinutes = appState.sessions.reduce((acc, s) => acc + (Number(s.minutes) || 0), 0);
             const totalInsights = appState.insights.length;
             const completedBooks = appState.books.filter(b => b.status === 'completed').length;
-            // Regra de XP: +10 XP por página + 2 XP por minuto + 25 XP por insight + 15 XP por plano de ação concluído
-            const completedActionPlans = appState.actionPlans.filter(a => a.completed).length;
-            const totalXP = (totalPages * 10) + (totalMinutes * 2) + (totalInsights * 25) + (completedActionPlans * 15) + (appState.bonusXP || 0);
+
+            // Regra de XP: +10 XP por página + 2 XP por minuto + 25 XP por insight
+            const totalXP = (totalPages * 10) + (totalMinutes * 2) + (totalInsights * 25) + (appState.bonusXP || 0);
 
             // Progressão de Níveis (cada nível exige 250 XP adicionais progressivamente)
             let level = 1;
@@ -1377,9 +1198,6 @@
             populateBookSelectors();
             renderSessionsHistory();
             renderInsights();
-            renderActionPlans();
-            renderPAHA();
-            updateSecondBrainBadges();
             renderEvolution(metrics);
             lucide.createIcons();
         }
@@ -1398,43 +1216,679 @@
         }
 
         // ==========================================
-        // MÓDULO 4: INSIGHTS (SEGUNDO CÉREBRO COSMOS, PLANO DE AÇÃO & PAHA)
+        // MÓDULO 1: DASHBOARD (INÍCIO)
         // ==========================================
-        function setSecondBrainSubtab(subtab) {
-            currentSecondBrainSubtab = subtab;
-            const panels = {
-                'insights': 'sb-panel-insights',
-                'action-plan': 'sb-panel-action-plan',
-                'paha': 'sb-panel-paha'
-            };
-            Object.entries(panels).forEach(([key, panelId]) => {
-                document.getElementById(panelId)?.classList.toggle('hidden', key !== subtab);
+        function renderDashboard(m) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            const dateFormatted = new Date().toLocaleDateString('pt-BR', options);
+            document.getElementById('greeting-date').textContent = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
+
+            document.getElementById('dash-streak-days').textContent = `${m.currentStreak} ${m.currentStreak === 1 ? 'dia' : 'dias'}`;
+            document.getElementById('dash-level-badge').textContent = `Nível ${m.level}`;
+            document.getElementById('dash-rank-title').textContent = m.rankTitle;
+            document.getElementById('dash-xp-current').textContent = m.remainingXP;
+            document.getElementById('dash-xp-target').textContent = m.xpThreshold;
+            const xpPct = Math.min(100, Math.round((m.remainingXP / m.xpThreshold) * 100));
+            document.getElementById('dash-xp-progress').style.width = `${xpPct}%`;
+
+            // Metas
+            const dailyTarget = appState.goals.dailyPages || 20;
+            const annualTarget = appState.goals.annualBooks || 12;
+            const dailyPct = Math.min(100, Math.round((m.pagesToday / dailyTarget) * 100));
+            const annualPct = Math.min(100, Math.round((m.completedBooks / annualTarget) * 100));
+
+            document.getElementById('goal-daily-current').textContent = m.pagesToday;
+            document.getElementById('goal-daily-target').textContent = dailyTarget;
+            document.getElementById('goal-daily-bar').style.width = `${dailyPct}%`;
+
+            document.getElementById('goal-year-label').textContent = new Date().getFullYear();
+            document.getElementById('goal-annual-current').textContent = m.completedBooks;
+            document.getElementById('goal-annual-target').textContent = annualTarget;
+            document.getElementById('goal-annual-bar').style.width = `${annualPct}%`;
+
+            // Estatísticas rápidas
+            document.getElementById('stat-total-pages').textContent = m.totalPages;
+            const hrs = Math.floor(m.totalMinutes / 60);
+            const mins = m.totalMinutes % 60;
+            document.getElementById('stat-total-time').textContent = `${hrs}h ${mins}m`;
+            document.getElementById('stat-books-done').textContent = m.completedBooks;
+            document.getElementById('stat-total-insights').textContent = m.totalInsights;
+
+            // Leitura em Andamento
+            const readingBooks = appState.books.filter(b => b.status === 'reading');
+            const container = document.getElementById('dash-current-book-container');
+
+            if (readingBooks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 px-4 rounded-xl bg-slate-900/60 border border-dashed border-slate-700">
+                        <p class="text-sm text-slate-400 mb-3">Nenhum livro marcado como "Lendo" no momento.</p>
+                        <button onclick="openBookModal()" class="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs">+ Adicionar Livro</button>
+                    </div>
+                `;
+            } else {
+                const book = readingBooks[0];
+                const pct = Math.min(100, Math.round((book.currentPage / book.totalPages) * 100));
+                const pagesLeft = Math.max(0, book.totalPages - book.currentPage);
+                const minsLeft = m.avgSpeed > 0 ? Math.round((pagesLeft / m.avgSpeed) * 60) : 0;
+                const estText = minsLeft >= 60 ? `${Math.floor(minsLeft/60)}h ${minsLeft%60}m restantes` : `${minsLeft}m restantes`;
+
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
+                        ${renderBookCoverHTML(book, 'w-20 h-28 sm:w-24 sm:h-32 shrink-0 mx-auto sm:mx-0')}
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-2">
+                                    <div>
+                                        <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400">${escapeHTML(book.category || 'Leitura')}</span>
+                                        <h4 class="font-bold text-lg text-white mt-1 leading-snug">${escapeHTML(book.title)}</h4>
+                                        <p class="text-xs text-slate-400">${escapeHTML(book.author)}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-300 font-medium">Pág. <strong>${book.currentPage}</strong> de ${book.totalPages}</span>
+                                    <span class="font-bold text-emerald-400">${pct}% • ${estText}</span>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                                </div>
+                                <div class="flex gap-2 mt-3">
+                                    <button onclick="startReadingSpecificBook('${book.id}')" class="flex-1 py-2 px-3 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-semibold text-xs transition flex items-center justify-center gap-1.5">
+                                        <i data-lucide="timer" class="w-3.5 h-3.5"></i> Cronometrar
+                                    </button>
+                                    <button onclick="openInsightModal('${book.id}')" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-semibold text-xs transition flex items-center justify-center gap-1.5">
+                                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> + Insight
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Mapa de Consistência (Últimos 28 dias)
+            const heatmapEl = document.getElementById('consistency-heatmap');
+            let cellsHTML = '';
+            for (let i = 27; i >= 0; i--) {
+                const dStr = getDaysAgoStr(i);
+                const pgs = m.pagesByDate[dStr] || 0;
+                const dayNum = dStr.split('-')[2];
+                let colorClass = 'bg-slate-900 border-slate-800 text-slate-600';
+                if (pgs > 0 && pgs < 15) colorClass = 'bg-emerald-900/90 border-emerald-700/60 text-emerald-200';
+                else if (pgs >= 15 && pgs < 35) colorClass = 'bg-emerald-600 border-emerald-500 text-white';
+                else if (pgs >= 35) colorClass = 'bg-emerald-400 border-emerald-300 text-slate-950 font-bold';
+
+                const isToday = i === 0 ? 'ring-2 ring-amber-400' : '';
+                cellsHTML += `
+                    <div title="${dStr}: ${pgs} páginas" class="aspect-square rounded-lg border ${colorClass} ${isToday} flex flex-col items-center justify-center text-[10px] select-none transition hover:scale-105">
+                        <span>${dayNum}</span>
+                    </div>
+                `;
+            }
+            heatmapEl.innerHTML = cellsHTML;
+        }
+
+        // ==========================================
+        // MÓDULO 2: ESTANTE (GESTÃO DE LIVROS)
+        // ==========================================
+        function setShelfFilter(filter) {
+            currentShelfFilter = filter;
+            document.querySelectorAll('.shelf-filter-btn').forEach(btn => {
+                const active = btn.dataset.filter === filter;
+                btn.className = active
+                    ? 'shelf-filter-btn px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-amber-500 text-slate-950'
+                    : 'shelf-filter-btn px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700';
+            });
+            renderShelf();
+        }
+
+        function renderShelf(metricsObj) {
+            const m = metricsObj || calculateMetrics();
+            const query = (document.getElementById('shelf-search')?.value || '').toLowerCase().trim();
+            const grid = document.getElementById('shelf-grid');
+
+            const filtered = appState.books.filter(book => {
+                const matchesStatus = currentShelfFilter === 'all' || book.status === currentShelfFilter;
+                const matchesQuery = !query ||
+                    book.title.toLowerCase().includes(query) ||
+                    book.author.toLowerCase().includes(query) ||
+                    (book.category || '').toLowerCase().includes(query);
+                return matchesStatus && matchesQuery;
             });
 
-            const buttons = {
-                'insights': 'sb-btn-insights',
-                'action-plan': 'sb-btn-action-plan',
-                'paha': 'sb-btn-paha'
-            };
-            Object.entries(buttons).forEach(([key, btnId]) => {
-                const btn = document.getElementById(btnId);
-                if (!btn) return;
-                btn.className = key === subtab
-                    ? 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition flex items-center gap-1.5'
-                    : 'px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition flex items-center gap-1.5';
-            });
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="md:col-span-2 text-center py-12 px-4 rounded-2xl bg-slate-800/50 border border-dashed border-slate-700">
+                        <i data-lucide="book-x" class="w-10 h-10 text-slate-500 mx-auto mb-3"></i>
+                        <p class="text-sm font-medium text-slate-300">Nenhum livro encontrado nesta visualização.</p>
+                        <p class="text-xs text-slate-500 mt-1">Altere o filtro ou adicione um novo livro à sua estante.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
 
-            if (subtab === 'action-plan') renderActionPlans();
-            if (subtab === 'paha') renderPAHA();
+            const statusLabels = {
+                reading: { text: 'Lendo', cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+                want: { text: 'Quero Ler', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+                completed: { text: 'Concluído', cls: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+                abandoned: { text: 'Abandonado', cls: 'bg-slate-700 text-slate-400 border-slate-600' }
+            };
+
+            grid.innerHTML = filtered.map(book => {
+                const pct = Math.min(100, Math.round((book.currentPage / book.totalPages) * 100));
+                const st = statusLabels[book.status] || statusLabels.reading;
+                const pagesLeft = Math.max(0, book.totalPages - book.currentPage);
+                const minsLeft = m.avgSpeed > 0 ? Math.round((pagesLeft / m.avgSpeed) * 60) : 0;
+                const estLabel = book.status === 'completed'
+                    ? 'Leitura concluída'
+                    : (minsLeft >= 60 ? `~${Math.floor(minsLeft/60)}h ${minsLeft%60}m restantes` : `~${minsLeft}m restantes`);
+
+                return `
+                    <div class="rounded-2xl bg-slate-800/80 border border-slate-700/70 p-4 flex gap-4 hover:border-slate-600 transition">
+                        ${renderBookCoverHTML(book, 'w-20 h-28 shrink-0')}
+                        <div class="flex-1 min-w-0 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${st.cls}">${st.text}</span>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="openBookModal('${book.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700" title="Editar">
+                                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button onclick="deleteBookConfirm('${book.id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-700" title="Excluir">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-base text-white truncate" title="${escapeHTML(book.title)}">${escapeHTML(book.title)}</h4>
+                                <p class="text-xs text-slate-400 truncate">${escapeHTML(book.author)}</p>
+                            </div>
+
+                            <div class="mt-3">
+                                <div class="flex justify-between text-[11px] mb-1">
+                                    <span class="text-slate-300">${book.currentPage} / ${book.totalPages} págs (${pct}%)</span>
+                                    <span class="text-slate-400">${estLabel}</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all" style="width: ${pct}%; background-color: ${book.color || '#F59E0B'}"></div>
+                                </div>
+                                <div class="flex gap-2 mt-2.5">
+                                    <button onclick="startReadingSpecificBook('${book.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-900 hover:bg-emerald-500/20 text-emerald-400 border border-slate-700 hover:border-emerald-500/40 text-xs font-semibold transition flex items-center justify-center gap-1">
+                                        <i data-lucide="play" class="w-3 h-3"></i> Ler
+                                    </button>
+                                    <button onclick="openInsightModal('${book.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-900 hover:bg-amber-500/20 text-amber-400 border border-slate-700 hover:border-amber-500/40 text-xs font-semibold transition flex items-center justify-center gap-1">
+                                        <i data-lucide="sparkles" class="w-3 h-3"></i> Insight
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
             lucide.createIcons();
         }
 
-        function updateSecondBrainBadges() {
-            const pendingCount = appState.actionPlans.filter(a => !a.completed).length;
-            const badge = document.getElementById('sb-action-badge');
-            if (badge) badge.textContent = pendingCount;
+        function renderBookCoverHTML(book, sizeClasses) {
+            const bg = book.color || '#F59E0B';
+            if (book.coverUrl) {
+                return `
+                    <div class="${sizeClasses} rounded-xl overflow-hidden shadow-lg relative bg-slate-900 border border-slate-700">
+                        <img src="${escapeHTML(book.coverUrl)}" alt="${escapeHTML(book.title)}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none; background: linear-gradient(135deg, ${bg}dd, #0f172a);" class="w-full h-full p-2.5 flex-col justify-between text-white">
+                            <span class="text-[10px] font-bold leading-tight line-clamp-3">${escapeHTML(book.title)}</span>
+                            <span class="text-[9px] opacity-80 truncate">${escapeHTML(book.author)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            return `
+                <div style="background: linear-gradient(145deg, ${bg}, #1e293b);" class="${sizeClasses} rounded-xl p-2.5 flex flex-col justify-between text-white shadow-lg border border-white/10 relative overflow-hidden">
+                    <div class="w-1.5 inset-y-0 left-0 bg-black/25 absolute"></div>
+                    <span class="text-[11px] font-bold leading-tight line-clamp-3 pl-1 drop-shadow">${escapeHTML(book.title)}</span>
+                    <span class="text-[9px] font-medium text-white/85 truncate pl-1">${escapeHTML(book.author)}</span>
+                </div>
+            `;
         }
 
+        function selectCoverColor(color) {
+            document.getElementById('book-color').value = color;
+            document.querySelectorAll('.color-swatch').forEach(btn => {
+                btn.classList.toggle('ring-2', btn.dataset.color === color);
+                btn.classList.toggle('ring-white', btn.dataset.color === color);
+            });
+        }
+
+        function openBookModal(bookId = null) {
+            const modal = document.getElementById('book-modal');
+            if (bookId) {
+                const b = appState.books.find(x => x.id === bookId);
+                if (!b) return;
+                document.getElementById('book-modal-title').textContent = 'Editar Livro';
+                document.getElementById('book-id').value = b.id;
+                document.getElementById('book-title').value = b.title;
+                document.getElementById('book-author').value = b.author;
+                document.getElementById('book-category').value = b.category || '';
+                document.getElementById('book-total-pages').value = b.totalPages;
+                document.getElementById('book-current-page').value = b.currentPage;
+                document.getElementById('book-status').value = b.status;
+                document.getElementById('book-cover-url').value = b.coverUrl || '';
+                selectCoverColor(b.color || '#F59E0B');
+            } else {
+                document.getElementById('book-modal-title').textContent = 'Adicionar Novo Livro';
+                document.getElementById('book-id').value = '';
+                document.getElementById('book-title').value = '';
+                document.getElementById('book-author').value = '';
+                document.getElementById('book-category').value = '';
+                document.getElementById('book-total-pages').value = '';
+                document.getElementById('book-current-page').value = '0';
+                document.getElementById('book-status').value = 'reading';
+                document.getElementById('book-cover-url').value = '';
+                selectCoverColor('#F59E0B');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function saveBookForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('book-id').value;
+            const title = document.getElementById('book-title').value.trim();
+            const author = document.getElementById('book-author').value.trim();
+            const category = document.getElementById('book-category').value.trim() || 'Geral';
+            const totalPages = Math.max(1, parseInt(document.getElementById('book-total-pages').value, 10));
+            let currentPage = Math.max(0, parseInt(document.getElementById('book-current-page').value || '0', 10));
+            let status = document.getElementById('book-status').value;
+            const color = document.getElementById('book-color').value;
+            const coverUrl = document.getElementById('book-cover-url').value.trim();
+
+            if (currentPage >= totalPages) {
+                currentPage = totalPages;
+                status = 'completed';
+            } else if (status === 'completed') {
+                currentPage = totalPages;
+            }
+
+            if (id) {
+                const idx = appState.books.findIndex(b => b.id === id);
+                if (idx !== -1) {
+                    appState.books[idx] = {
+                        ...appState.books[idx],
+                        title, author, category, totalPages, currentPage, status, color, coverUrl
+                    };
+                    showToast('Livro atualizado com sucesso!', 'success');
+                }
+            } else {
+                appState.books.unshift({
+                    id: 'book-' + Date.now(),
+                    title, author, category, totalPages, currentPage, status, color, coverUrl,
+                    createdAt: getTodayStr()
+                });
+                showToast('Livro adicionado à estante!', 'success');
+            }
+
+            saveState();
+            closeModal('book-modal');
+            refreshAllViews();
+        }
+
+        function deleteBookConfirm(bookId) {
+            openConfirmModal(
+                'Excluir Livro',
+                'Deseja remover este livro da estante? As sessões e insights vinculados permanecerão no histórico.',
+                () => {
+                    appState.books = appState.books.filter(b => b.id !== bookId);
+                    saveState();
+                    refreshAllViews();
+                    showToast('Livro removido.', 'info');
+                }
+            );
+        }
+
+        // ==========================================
+        // MÓDULO 3: LEITURA (CRONÔMETRO & MANUAL)
+        // ==========================================
+        function setReadingSubtab(mode) {
+            const isTimer = mode === 'timer';
+            document.getElementById('reading-timer-panel').classList.toggle('hidden', !isTimer);
+            document.getElementById('reading-manual-panel').classList.toggle('hidden', isTimer);
+
+            document.getElementById('subtab-btn-timer').className = isTimer
+                ? 'px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition'
+                : 'px-4 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
+            document.getElementById('subtab-btn-manual').className = !isTimer
+                ? 'px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition'
+                : 'px-4 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
+
+            if (!isTimer) {
+                document.getElementById('manual-date').value = getTodayStr();
+                onManualBookChange();
+            }
+        }
+
+        function populateBookSelectors() {
+            const timerSel = document.getElementById('timer-book-select');
+            const manualSel = document.getElementById('manual-book-select');
+            const insightModalSel = document.getElementById('insight-book-id');
+            const insightFilterSel = document.getElementById('insight-book-filter');
+
+            const prevTimerVal = timerSel.value;
+            const prevManualVal = manualSel.value;
+            const prevFilterVal = insightFilterSel.value;
+
+            if (appState.books.length === 0) {
+                const emptyOpt = `<option value="">Cadastre um livro na Estante primeiro</option>`;
+                timerSel.innerHTML = emptyOpt;
+                manualSel.innerHTML = emptyOpt;
+                insightModalSel.innerHTML = emptyOpt;
+                insightFilterSel.innerHTML = `<option value="all">Todos os Livros</option>`;
+                return;
+            }
+
+            // Prioriza livros com status 'reading' no topo
+            const sortedBooks = [...appState.books].sort((a, b) => (a.status === 'reading' ? -1 : 1));
+            const optionsHTML = sortedBooks.map(b =>
+                `<option value="${b.id}">${escapeHTML(b.title)} (${b.currentPage}/${b.totalPages} págs)</option>`
+            ).join('');
+
+            timerSel.innerHTML = optionsHTML;
+            manualSel.innerHTML = optionsHTML;
+            insightModalSel.innerHTML = optionsHTML;
+            insightFilterSel.innerHTML = `<option value="all">Todos os Livros</option>` + optionsHTML;
+
+            if (prevTimerVal && appState.books.some(b => b.id === prevTimerVal)) timerSel.value = prevTimerVal;
+            if (prevManualVal && appState.books.some(b => b.id === prevManualVal)) manualSel.value = prevManualVal;
+            if (prevFilterVal) insightFilterSel.value = prevFilterVal;
+
+            onTimerBookChange();
+        }
+
+        function startReadingSpecificBook(bookId) {
+            switchTab('leitura');
+            setReadingSubtab('timer');
+            const sel = document.getElementById('timer-book-select');
+            sel.value = bookId;
+            onTimerBookChange();
+        }
+
+        function onTimerBookChange() {
+            const bookId = document.getElementById('timer-book-select').value;
+            const book = appState.books.find(b => b.id === bookId);
+            const m = calculateMetrics();
+            document.getElementById('timer-avg-speed').textContent = `${m.avgSpeed} págs/h`;
+
+            if (book) {
+                document.getElementById('timer-book-meta').textContent = `Página atual: ${book.currentPage} de ${book.totalPages} • ${book.author}`;
+            } else {
+                document.getElementById('timer-book-meta').textContent = 'Nenhum livro selecionado';
+            }
+            updateTimerDisplay();
+        }
+
+        function onManualBookChange() {
+            const bookId = document.getElementById('manual-book-select').value;
+            const book = appState.books.find(b => b.id === bookId);
+            if (book) {
+                document.getElementById('manual-start-page').value = book.currentPage;
+                document.getElementById('manual-end-page').value = Math.min(book.totalPages, book.currentPage + 15);
+            }
+        }
+
+        function startTimer() {
+            const bookId = document.getElementById('timer-book-select').value;
+            if (!bookId) {
+                showToast('Adicione e selecione um livro antes de iniciar.', 'error');
+                return;
+            }
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+
+            document.getElementById('timer-status-label').textContent = 'Lendo com foco...';
+            document.getElementById('timer-status-label').className = 'text-xs font-bold uppercase tracking-widest text-emerald-400 mb-2 animate-pulse-slow';
+
+            document.getElementById('btn-timer-start').classList.add('hidden');
+            document.getElementById('btn-timer-pause').classList.remove('hidden');
+            document.getElementById('btn-timer-finish').classList.remove('hidden');
+            document.getElementById('btn-timer-reset').classList.remove('hidden');
+            document.getElementById('desktop-timer-dot').classList.remove('hidden');
+            document.getElementById('mobile-timer-dot').classList.remove('hidden');
+
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('timer-status-label').textContent = 'Sessão Pausada';
+            document.getElementById('timer-status-label').className = 'text-xs font-bold uppercase tracking-widest text-amber-400 mb-2';
+
+            document.getElementById('btn-timer-start').innerHTML = `<i data-lucide="play" class="w-5 h-5 fill-slate-950"></i> Retomar`;
+            document.getElementById('btn-timer-start').classList.remove('hidden');
+            document.getElementById('btn-timer-pause').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function resetTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            updateTimerDisplay();
+
+            document.getElementById('timer-status-label').textContent = 'Pronto para iniciar';
+            document.getElementById('timer-status-label').className = 'text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2';
+
+            document.getElementById('btn-timer-start').innerHTML = `<i data-lucide="play" class="w-5 h-5 fill-slate-950"></i> Iniciar Leitura`;
+            document.getElementById('btn-timer-start').classList.remove('hidden');
+            document.getElementById('btn-timer-pause').classList.add('hidden');
+            document.getElementById('btn-timer-finish').classList.add('hidden');
+            document.getElementById('btn-timer-reset').classList.add('hidden');
+            document.getElementById('desktop-timer-dot').classList.add('hidden');
+            document.getElementById('mobile-timer-dot').classList.add('hidden');
+            lucide.createIcons();
+        }
+
+        function updateTimerDisplay() {
+            const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${hrs}:${mins}:${secs}`;
+
+            const m = calculateMetrics();
+            const estPages = Math.round((timerSeconds / 3600) * m.avgSpeed);
+            document.getElementById('timer-est-pages').textContent = `~${estPages} págs`;
+        }
+
+        function openFinishSessionModal() {
+            if (isTimerRunning) pauseTimer();
+            const bookId = document.getElementById('timer-book-select').value;
+            const book = appState.books.find(b => b.id === bookId);
+            if (!book) return;
+
+            const mins = Math.max(1, Math.round(timerSeconds / 60));
+            document.getElementById('finish-modal-time').textContent = `${mins} min`;
+            document.getElementById('finish-modal-prev-page').textContent = book.currentPage;
+            document.getElementById('finish-modal-end-page').value = Math.min(book.totalPages, book.currentPage + Math.max(1, Math.round((timerSeconds / 3600) * 25)));
+            document.getElementById('finish-modal-end-page').max = book.totalPages;
+            document.getElementById('finish-modal-add-insight').checked = false;
+
+            document.getElementById('finish-session-modal').classList.remove('hidden');
+        }
+
+        function confirmFinishTimerSession(e) {
+            e.preventDefault();
+            const bookId = document.getElementById('timer-book-select').value;
+            const book = appState.books.find(b => b.id === bookId);
+            if (!book) return;
+
+            const endPage = Math.min(book.totalPages, Math.max(book.currentPage, parseInt(document.getElementById('finish-modal-end-page').value, 10)));
+            const minutes = Math.max(1, Math.round(timerSeconds / 60));
+            const pagesRead = Math.max(0, endPage - book.currentPage);
+            const openInsightAfter = document.getElementById('finish-modal-add-insight').checked;
+
+            recordSessionAndReward(book, getTodayStr(), minutes, book.currentPage, endPage, pagesRead);
+
+            closeModal('finish-session-modal');
+            resetTimer();
+            if (isAmbientPlaying) toggleAmbientAudio();
+
+            if (openInsightAfter) {
+                openInsightModal(book.id, endPage);
+            }
+        }
+
+        function saveManualSession(e) {
+            e.preventDefault();
+            const bookId = document.getElementById('manual-book-select').value;
+            const book = appState.books.find(b => b.id === bookId);
+            if (!book) {
+                showToast('Selecione um livro válido.', 'error');
+                return;
+            }
+            const date = document.getElementById('manual-date').value || getTodayStr();
+            const minutes = Math.max(1, parseInt(document.getElementById('manual-minutes').value, 10));
+            const startPage = Math.max(0, parseInt(document.getElementById('manual-start-page').value, 10));
+            const endPage = Math.min(book.totalPages, Math.max(startPage, parseInt(document.getElementById('manual-end-page').value, 10)));
+            const pagesRead = Math.max(0, endPage - startPage);
+
+            recordSessionAndReward(book, date, minutes, startPage, endPage, pagesRead);
+            setReadingSubtab('timer');
+        }
+
+        function recordSessionAndReward(book, date, minutes, startPage, endPage, pagesRead) {
+            appState.sessions.unshift({
+                id: 'sess-' + Date.now(),
+                bookId: book.id,
+                date,
+                minutes,
+                startPage,
+                endPage,
+                pagesRead
+            });
+
+            if (endPage > book.currentPage) {
+                book.currentPage = endPage;
+            }
+            if (book.currentPage >= book.totalPages) {
+                book.currentPage = book.totalPages;
+                book.status = 'completed';
+                book.completedAt = date;
+            } else if (book.status === 'want') {
+                book.status = 'reading';
+            }
+
+            const xpGained = (pagesRead * 10) + (minutes * 2);
+            saveState();
+            refreshAllViews();
+            showToast(`Sessão salva! +${pagesRead} págs e +${xpGained} XP ganhos! 🎉`, 'success');
+        }
+
+        function renderSessionsHistory() {
+            const list = document.getElementById('sessions-history-list');
+            if (appState.sessions.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Nenhuma sessão registrada ainda.</p>`;
+                return;
+            }
+
+            list.innerHTML = appState.sessions.slice(0, 15).map(s => {
+                const book = appState.books.find(b => b.id === s.bookId);
+                const title = book ? book.title : 'Livro removido';
+                const xp = (s.pagesRead * 10) + (s.minutes * 2);
+                const speed = s.minutes > 0 ? Math.round((s.pagesRead / s.minutes) * 60) : 0;
+                const dateFormatted = s.date.split('-').reverse().join('/');
+
+                return `
+                    <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/50">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-white truncate">${escapeHTML(title)}</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">${dateFormatted}</span>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-0.5">
+                                Págs ${s.startPage} → ${s.endPage} (<strong class="text-emerald-400">+${s.pagesRead} págs</strong>) • ${s.minutes} min (${speed} págs/h)
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-400">+${xp} XP</span>
+                            <button onclick="deleteSession('${s.id}')" class="p-1.5 text-slate-500 hover:text-red-400" title="Remover sessão">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function deleteSession(sessionId) {
+            appState.sessions = appState.sessions.filter(s => s.id !== sessionId);
+            saveState();
+            refreshAllViews();
+            showToast('Sessão removida do histórico.', 'info');
+        }
+
+        // Web Audio API: Gerador de Ruído Marrom Suave (Chuva / Foco)
+        function toggleAmbientAudio() {
+            const btn = document.getElementById('ambient-toggle-btn');
+            const iconBox = document.getElementById('ambient-icon-box');
+
+            if (isAmbientPlaying) {
+                if (audioCtx) {
+                    audioCtx.close();
+                    audioCtx = null;
+                }
+                isAmbientPlaying = false;
+                btn.textContent = 'Desligado';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-200 hover:bg-slate-600 transition';
+                iconBox.className = 'w-8 h-8 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center';
+                return;
+            }
+
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                const bufferSize = 2 * audioCtx.sampleRate;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                let lastOut = 0.0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02;
+                    lastOut = output[i];
+                    output[i] *= 2.2;
+                }
+
+                noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = noiseBuffer;
+                noiseNode.loop = true;
+
+                // Filtro passa-baixa para som de chuva distante
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 420;
+
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = 0.18;
+
+                noiseNode.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                noiseNode.start(0);
+
+                isAmbientPlaying = true;
+                btn.textContent = 'Tocando';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition';
+                iconBox.className = 'w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center';
+            } catch (err) {
+                showToast('Não foi possível iniciar o áudio neste navegador.', 'error');
+            }
+        }
+
+        // ==========================================
+        // MÓDULO 4: INSIGHTS (SEGUNDO CÉREBRO COSMOS)
+        // ==========================================
         const cosmosMeta = {
             quote: { label: 'Citação / Destaque', icon: 'quote', badgeCls: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
             concept: { label: 'Conceito / Resumo', icon: 'brain', badgeCls: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
@@ -1554,14 +2008,9 @@
                         <div>
                             <div class="flex items-center justify-between gap-2 mb-3">
                                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${meta.badgeCls}">${meta.label}</span>
-                                <div class="flex items-center gap-1">
-                                    <button onclick="openActionPlanModal('${ins.id}')" class="p-1.5 rounded-lg text-amber-400 hover:bg-amber-500/15 transition" title="Transformar em Plano de Ação">
-                                        <i data-lucide="target" class="w-4 h-4"></i>
-                                    </button>
-                                    <button onclick="deleteInsight('${ins.id}')" class="text-slate-500 hover:text-red-400 p-1" title="Excluir">
-                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                </div>
+                                <button onclick="deleteInsight('${ins.id}')" class="text-slate-500 hover:text-red-400 p-1" title="Excluir">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
                             </div>
                             <p class="text-sm text-slate-100 leading-relaxed ${ins.type === 'quote' ? 'italic border-l-2 border-amber-400 pl-3' : ''}">
                                 ${ins.type === 'quote' ? `"${escapeHTML(ins.content)}"` : escapeHTML(ins.content)}
@@ -1600,274 +2049,6 @@
                 </div>
             `;
             box.classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        // --- PLANO DE AÇÃO (VINCULADO AOS INSIGHTS) ---
-        function openActionPlanModal(insightId) {
-            const ins = appState.insights.find(i => i.id === insightId);
-            if (!ins) return;
-            document.getElementById('action-source-insight-id').value = ins.id;
-            document.getElementById('action-source-insight-preview').textContent = `"${ins.content}"`;
-            document.getElementById('action-plan-title').value = '';
-            document.getElementById('action-plan-cadence').value = '';
-            document.getElementById('action-plan-modal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function saveActionPlanForm(e) {
-            e.preventDefault();
-            const insightId = document.getElementById('action-source-insight-id').value;
-            const actionText = document.getElementById('action-plan-title').value.trim();
-            const cadence = document.getElementById('action-plan-cadence').value.trim();
-            const ins = appState.insights.find(i => i.id === insightId);
-
-            appState.actionPlans.unshift({
-                id: 'act-' + Date.now(),
-                insightId: insightId || null,
-                bookId: ins ? ins.bookId : null,
-                actionText,
-                cadence,
-                completed: false,
-                createdAt: getTodayStr()
-            });
-
-            saveState();
-            closeModal('action-plan-modal');
-            refreshAllViews();
-            setSecondBrainSubtab('action-plan');
-            showToast('Ação prática adicionada ao seu Plano de Ação! 🎯', 'success');
-        }
-
-        function setActionFilter(filter) {
-            currentActionFilter = filter;
-            document.querySelectorAll('.action-filter-btn').forEach(btn => {
-                const active = btn.dataset.actionFilter === filter;
-                btn.className = active
-                    ? 'action-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950'
-                    : 'action-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white';
-            });
-            renderActionPlans();
-        }
-
-        function toggleActionPlanComplete(actionId) {
-            const item = appState.actionPlans.find(a => a.id === actionId);
-            if (!item) return;
-            item.completed = !item.completed;
-            saveState();
-            refreshAllViews();
-            if (item.completed) {
-                showToast('Plano de ação concluído! +15 XP 🎯', 'success');
-            }
-        }
-
-        function deleteActionPlan(actionId) {
-            appState.actionPlans = appState.actionPlans.filter(a => a.id !== actionId);
-            saveState();
-            refreshAllViews();
-            showToast('Plano de ação removido.', 'info');
-        }
-
-        function renderActionPlans() {
-            const container = document.getElementById('action-plans-container');
-            if (!container) return;
-
-            if (appState.actionPlans.length === 0) {
-                container.innerHTML = `
-                    <div class="rounded-2xl bg-slate-800/70 border border-slate-700/70 p-8 sm:p-10 text-center space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-500/15 text-purple-400 flex items-center justify-center mx-auto">
-                            <i data-lucide="target" class="w-6 h-6"></i>
-                        </div>
-                        <h4 class="text-base font-bold text-white">Nenhum Plano de Ação criado</h4>
-                        <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
-                            Abra um insight no Segundo Cérebro e toque no ícone de alvo para transformá-lo em uma ação prática.
-                        </p>
-                        <div class="pt-2">
-                            <button onclick="setSecondBrainSubtab('insights')" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold transition shadow-lg shadow-purple-600/20">
-                                Ver meus insights
-                            </button>
-                        </div>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            const filtered = appState.actionPlans.filter(a => {
-                if (currentActionFilter === 'pending') return !a.completed;
-                if (currentActionFilter === 'done') return a.completed;
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="rounded-2xl bg-slate-800/60 border border-slate-700/60 p-6 text-center text-xs text-slate-400">Nenhuma ação neste filtro.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(a => {
-                const srcInsight = appState.insights.find(i => i.id === a.insightId);
-                const book = appState.books.find(b => b.id === (a.bookId || (srcInsight && srcInsight.bookId)));
-                return `
-                    <div class="rounded-2xl bg-slate-800/80 border ${a.completed ? 'border-emerald-500/30 opacity-80' : 'border-slate-700/70'} p-4 flex items-start justify-between gap-3">
-                        <div class="flex items-start gap-3 min-w-0">
-                            <button onclick="toggleActionPlanComplete('${a.id}')" class="mt-0.5 text-emerald-400 hover:scale-105 transition shrink-0" title="Alternar conclusão">
-                                <i data-lucide="${a.completed ? 'check-circle-2' : 'circle'}" class="w-5 h-5"></i>
-                            </button>
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold ${a.completed ? 'line-through text-slate-400' : 'text-white'}">${escapeHTML(a.actionText)}</p>
-                                <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-slate-400">
-                                    ${book ? `<span class="text-amber-300/90">📖 ${escapeHTML(book.title)}</span>` : ''}
-                                    ${a.cadence ? `<span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700">⏱ ${escapeHTML(a.cadence)}</span>` : ''}
-                                    ${srcInsight ? `<span class="truncate max-w-xs">💡 "${escapeHTML(srcInsight.content)}"</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="deleteActionPlan('${a.id}')" class="text-slate-500 hover:text-red-400 p-1 shrink-0" title="Excluir ação">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        // --- PAHA (PROJETOS, ÁREAS, HABILIDADES E ACERVO) ---
-        const pahaCategoryLabels = {
-            projects: 'Novo Projeto',
-            areas: 'Nova Área',
-            skills: 'Nova Habilidade'
-        };
-
-        function openPahaModal(category) {
-            document.getElementById('paha-item-category').value = category;
-            document.getElementById('paha-modal-title').textContent = pahaCategoryLabels[category] || 'Novo Item PAHA';
-            document.getElementById('paha-item-name').value = '';
-            document.getElementById('paha-item-notes').value = '';
-
-            const bookSel = document.getElementById('paha-item-book');
-            bookSel.innerHTML = `<option value="">Nenhum livro</option>` + appState.books.map(b =>
-                `<option value="${b.id}">${escapeHTML(b.title)}</option>`
-            ).join('');
-
-            const insSel = document.getElementById('paha-item-insight');
-            insSel.innerHTML = `<option value="">Nenhum insight</option>` + appState.insights.map(i =>
-                `<option value="${i.id}">${escapeHTML(i.content.slice(0, 48))}${i.content.length > 48 ? '...' : ''}</option>`
-            ).join('');
-
-            document.getElementById('paha-modal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function savePahaItemForm(e) {
-            e.preventDefault();
-            const category = document.getElementById('paha-item-category').value;
-            const name = document.getElementById('paha-item-name').value.trim();
-            const notes = document.getElementById('paha-item-notes').value.trim();
-            const bookId = document.getElementById('paha-item-book').value || null;
-            const insightId = document.getElementById('paha-item-insight').value || null;
-
-            appState.pahaItems.unshift({
-                id: 'paha-' + Date.now(),
-                category,
-                name,
-                notes,
-                bookId,
-                insightId,
-                archived: false,
-                createdAt: getTodayStr()
-            });
-
-            saveState();
-            closeModal('paha-modal');
-            renderPAHA();
-            showToast('Item salvo no PAHA!', 'success');
-        }
-
-        function archivePahaItem(itemId) {
-            const item = appState.pahaItems.find(p => p.id === itemId);
-            if (!item) return;
-            item.archived = true;
-            saveState();
-            renderPAHA();
-            showToast('Item movido para o Acervo.', 'info');
-        }
-
-        function restorePahaItem(itemId) {
-            const item = appState.pahaItems.find(p => p.id === itemId);
-            if (!item) return;
-            item.archived = false;
-            saveState();
-            renderPAHA();
-            showToast('Item restaurado do Acervo!', 'success');
-        }
-
-        function renderPAHA() {
-            const emptyTexts = {
-                projects: 'Nenhum item em projetos ainda.',
-                areas: 'Nenhum item em áreas ainda.',
-                skills: 'Nenhum item em habilidades ainda.'
-            };
-
-            ['projects', 'areas', 'skills'].forEach(cat => {
-                const listEl = document.getElementById(`paha-list-${cat}`);
-                if (!listEl) return;
-                const items = appState.pahaItems.filter(p => p.category === cat && !p.archived);
-
-                if (items.length === 0) {
-                    listEl.innerHTML = `
-                        <div class="rounded-xl bg-slate-900/60 border border-slate-700/50 py-5 px-4 text-center text-xs text-slate-400">
-                            ${emptyTexts[cat]}
-                        </div>
-                    `;
-                } else {
-                    listEl.innerHTML = items.map(item => {
-                        const book = appState.books.find(b => b.id === item.bookId);
-                        const ins = appState.insights.find(i => i.id === item.insightId);
-                        return `
-                            <div class="rounded-xl bg-slate-900/80 border border-slate-700/60 p-3.5 flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <div class="text-sm font-bold text-white">${escapeHTML(item.name)}</div>
-                                    ${item.notes ? `<p class="text-xs text-slate-400 mt-1 whitespace-pre-line">${escapeHTML(item.notes)}</p>` : ''}
-                                    <div class="flex flex-wrap gap-2 mt-2 text-[11px] text-slate-400">
-                                        ${book ? `<span class="px-2 py-0.5 rounded bg-slate-800 text-amber-300">📖 ${escapeHTML(book.title)}</span>` : ''}
-                                        ${ins ? `<span class="px-2 py-0.5 rounded bg-slate-800 text-purple-300 truncate max-w-xs">💡 ${escapeHTML(ins.content)}</span>` : ''}
-                                    </div>
-                                </div>
-                                <button onclick="archivePahaItem('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1 shrink-0 transition" title="Arquivar no Acervo">
-                                    <i data-lucide="archive" class="w-3.5 h-3.5"></i> Arquivar
-                                </button>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            });
-
-            // ACERVO (Itens arquivados)
-            const archiveEl = document.getElementById('paha-list-archive');
-            if (archiveEl) {
-                const archivedItems = appState.pahaItems.filter(p => p.archived);
-                if (archivedItems.length === 0) {
-                    archiveEl.innerHTML = `
-                        <div class="rounded-xl bg-slate-900/50 border border-slate-700/40 py-5 px-4 text-center text-xs text-slate-400">
-                            Nenhum item arquivado no acervo ainda.
-                        </div>
-                    `;
-                } else {
-                    const catNames = { projects: 'Projeto', areas: 'Área', skills: 'Habilidade' };
-                    archiveEl.innerHTML = archivedItems.map(item => `
-                        <div class="rounded-xl bg-slate-900/70 border border-slate-700/50 p-3.5 flex items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-amber-400 mr-2">${catNames[item.category] || 'Item'}</span>
-                                <span class="text-sm font-semibold text-slate-200">${escapeHTML(item.name)}</span>
-                            </div>
-                            <button onclick="restorePahaItem('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-bold text-emerald-400 flex items-center gap-1 shrink-0 transition">
-                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Restaurar
-                            </button>
-                        </div>
-                    `).join('');
-                }
-            }
-
             lucide.createIcons();
         }
 
@@ -2029,8 +2210,6 @@
                         books: imported.books || [],
                         sessions: imported.sessions || [],
                         insights: imported.insights || [],
-                        actionPlans: imported.actionPlans || [],
-                        pahaItems: imported.pahaItems || [],
                         goals: imported.goals || { dailyPages: 20, annualBooks: 12 },
                         bonusXP: imported.bonusXP || 0
                     };
@@ -2067,8 +2246,6 @@
                         books: [],
                         sessions: [],
                         insights: [],
-                        actionPlans: [],
-                        pahaItems: [],
                         goals: { dailyPages: 20, annualBooks: 12 },
                         bonusXP: 0
                     };
