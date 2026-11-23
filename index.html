@@ -398,20 +398,45 @@
                             </div>
                         </div>
 
-                        <!-- Ambient Sound Toggle (Web Audio API Rain/Brown Noise) -->
-                        <div class="flex items-center justify-between bg-slate-800/70 border border-slate-700/60 px-4 py-3 rounded-xl">
-                            <div class="flex items-center gap-2.5 text-left">
+                        <!-- Player de sons ambientes para leitura -->
+                        <div class="bg-slate-800/70 border border-slate-700/60 px-4 py-4 rounded-xl space-y-3 text-left">
+                            <div class="flex items-center gap-2.5">
                                 <div id="ambient-icon-box" class="w-8 h-8 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center">
-                                    <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+                                    <i data-lucide="headphones" class="w-4 h-4"></i>
                                 </div>
                                 <div>
-                                    <div class="text-xs font-bold text-white">Som Ambiente de Foco</div>
-                                    <div class="text-[11px] text-slate-400">Chuva suave / Ruído marrom relaxante</div>
+                                    <div class="text-xs font-bold text-white">Sons para Concentração</div>
+                                    <div class="text-[11px] text-slate-400">Escolha um ambiente para acompanhar sua leitura</div>
                                 </div>
                             </div>
-                            <button onclick="toggleAmbientAudio()" id="ambient-toggle-btn" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-200 hover:bg-slate-600 transition">
-                                Desligado
-                            </button>
+                            <div class="flex gap-2">
+                                <select id="ambient-sound-select" onchange="changeAmbientSound()" aria-label="Escolher som ambiente" class="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
+                                    <option value="yt:Uqwoopf0sx0">▶️ YouTube — Som 1</option>
+                                    <option value="yt:D0KMxRMfwxE">▶️ YouTube — Som 2</option>
+                                    <option value="yt:0UN_HbOTTcI">▶️ YouTube — Som 3</option>
+                                    <option value="yt:i-x3g0OIaJ0">▶️ YouTube — Som 4</option>
+                                    <option value="yt:Hd7qAbsi-Eg">▶️ YouTube — Som 5</option>
+                                    <option value="yt:fSdIKdAOW5I">▶️ YouTube — Som 6</option>
+                                    <option value="rain">🌧️ Chuva suave (simulada)</option>
+                                    <option value="ocean">🌊 Ondas do mar (simuladas)</option>
+                                    <option value="brown">🟤 Ruído marrom</option>
+                                    <option value="pink">🌸 Ruído rosa</option>
+                                    <option value="white">⚪ Ruído branco</option>
+                                    <option value="fan">🌀 Ventilador (simulado)</option>
+                                </select>
+                                <button onclick="toggleAmbientAudio()" id="ambient-toggle-btn" aria-pressed="false" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-700 text-slate-200 hover:bg-slate-600 transition">Tocar</button>
+                            </div>
+                            <div id="ambient-volume-row" class="flex items-center gap-3">
+                                <i data-lucide="volume-1" class="w-4 h-4 text-slate-400"></i>
+                                <input type="range" id="ambient-volume" min="0" max="100" value="35" step="1" oninput="changeAmbientVolume()" aria-label="Volume do som" class="flex-1 accent-emerald-500">
+                                <span id="ambient-volume-label" class="text-xs tabular-nums text-slate-400 w-9 text-right">35%</span>
+                            </div>
+                            <div id="youtube-player-panel" class="hidden space-y-2">
+                                <p class="text-[11px] text-amber-300">Toque no play dentro do vídeo. Precisa de internet; o som pode parar com a tela bloqueada.</p>
+                                <div id="youtube-player-holder" class="w-full aspect-video rounded-lg overflow-hidden bg-slate-950 border border-slate-700"></div>
+                                <a id="youtube-video-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-block text-xs text-sky-400 underline">Abrir vídeo diretamente no YouTube</a>
+                            </div>
+                            <p id="ambient-simulated-note" class="text-[11px] text-slate-500">Sons sintetizados no aparelho, sem arquivos externos. Em alguns celulares, o áudio pode parar quando a tela é bloqueada.</p>
                         </div>
 
                         <!-- Timer Controls -->
@@ -1088,10 +1113,13 @@
         let timerSeconds = 0;
         let isTimerRunning = false;
 
-        // Web Audio API para som ambiente (Chuva / Ruído Marrom suave)
+        // Player de som gerado por Web Audio API; não altera dados existentes.
         let audioCtx = null;
         let noiseNode = null;
         let gainNode = null;
+        let ambientFilter = null;
+        let ambientLfo = null;
+        let ambientLfoGain = null;
         let isAmbientPlaying = false;
 
         // ==========================================
@@ -1907,50 +1935,157 @@
             }).join('');
         }
 
-        function toggleAmbientAudio() {
+        // Os links do YouTube são exibidos no player oficial, sem extrair ou baixar áudio.
+        function isYouTubeSound() {
+            return document.getElementById('ambient-sound-select').value.startsWith('yt:');
+        }
+
+        function updateYouTubePanel() {
+            const selected = document.getElementById('ambient-sound-select').value;
+            const isYT = selected.startsWith('yt:');
+            const panel = document.getElementById('youtube-player-panel');
+            const holder = document.getElementById('youtube-player-holder');
+            const toggle = document.getElementById('ambient-toggle-btn');
+            const volume = document.getElementById('ambient-volume-row');
+            const note = document.getElementById('ambient-simulated-note');
+            holder.replaceChildren(); // Remove o iframe anterior e interrompe sua reprodução.
+            panel.classList.toggle('hidden', !isYT);
+            toggle.classList.toggle('hidden', isYT);
+            volume.classList.toggle('hidden', isYT);
+            note.classList.toggle('hidden', isYT);
+            if (!isYT) return;
+            const id = selected.slice(3);
+            const allowed = ['Uqwoopf0sx0', 'D0KMxRMfwxE', '0UN_HbOTTcI', 'i-x3g0OIaJ0', 'Hd7qAbsi-Eg', 'fSdIKdAOW5I'];
+            if (!allowed.includes(id)) return;
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${id}?controls=1&playsinline=1&loop=1&playlist=${id}`;
+            iframe.title = 'Som de leitura — vídeo do YouTube';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            iframe.allowFullscreen = true;
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.style.cssText = 'width:100%;height:100%;border:0;';
+            holder.appendChild(iframe);
+            document.getElementById('youtube-video-link').href = `https://www.youtube.com/watch?v=${id}`;
+        }
+
+        function stopAmbientAudio() {
+            isAmbientPlaying = false;
+            try { if (noiseNode) noiseNode.stop(); } catch (_) {}
+            if (audioCtx) audioCtx.close().catch(() => {});
+            audioCtx = noiseNode = gainNode = ambientFilter = ambientLfo = ambientLfoGain = null;
+            updateAmbientUI();
+        }
+
+        function updateAmbientUI() {
             const btn = document.getElementById('ambient-toggle-btn');
             const box = document.getElementById('ambient-icon-box');
-            if (isAmbientPlaying) {
-                if (audioCtx) {
-                    audioCtx.close();
-                    audioCtx = null;
-                }
-                isAmbientPlaying = false;
-                btn.textContent = 'Desligado';
-                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-200 hover:bg-slate-600 transition';
-                box.className = 'w-8 h-8 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center';
-                return;
-            }
+            if (!btn || !box) return;
+            btn.textContent = isAmbientPlaying ? 'Pausar' : 'Tocar';
+            btn.setAttribute('aria-pressed', String(isAmbientPlaying));
+            btn.className = isAmbientPlaying
+                ? 'px-4 py-2 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition'
+                : 'px-4 py-2 rounded-lg text-xs font-bold bg-slate-700 text-slate-200 hover:bg-slate-600 transition';
+            box.className = isAmbientPlaying
+                ? 'w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center'
+                : 'w-8 h-8 rounded-lg bg-slate-700 text-slate-300 flex items-center justify-center';
+        }
+
+        function changeAmbientVolume() {
+            const slider = document.getElementById('ambient-volume');
+            const value = Number(slider.value);
+            document.getElementById('ambient-volume-label').textContent = value + '%';
+            localStorage.setItem('bookverso_ambient_volume', String(value));
+            if (gainNode && audioCtx) gainNode.gain.setTargetAtTime(value / 100 * 0.19, audioCtx.currentTime, 0.04);
+        }
+
+        function changeAmbientSound() {
+            const selected = document.getElementById('ambient-sound-select').value;
+            localStorage.setItem('bookverso_ambient_sound', selected);
+            const wasPlaying = isAmbientPlaying;
+            if (wasPlaying) stopAmbientAudio();
+            updateYouTubePanel();
+            if (wasPlaying && !isYouTubeSound()) startAmbientAudio();
+        }
+
+        function toggleAmbientAudio() {
+            if (isAmbientPlaying) stopAmbientAudio();
+            else startAmbientAudio();
+        }
+
+        function startAmbientAudio() {
+            if (isYouTubeSound()) { updateYouTubePanel(); return; }
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) throw new Error('Web Audio indisponível');
                 audioCtx = new AudioContextClass();
-                const bufferSize = 2 * audioCtx.sampleRate;
-                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                let lastOut = 0.0;
-                for (let i = 0; i < bufferSize; i++) {
+                const type = document.getElementById('ambient-sound-select').value;
+                const sampleRate = audioCtx.sampleRate;
+                const buffer = audioCtx.createBuffer(1, sampleRate * 4, sampleRate);
+                const output = buffer.getChannelData(0);
+                let brown = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < output.length; i++) {
                     const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 1.8;
+                    brown = (brown + 0.02 * white) / 1.02;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    const pink = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                    b6 = white * 0.115926;
+                    output[i] = type === 'brown' || type === 'ocean' ? brown * 3.5
+                        : type === 'pink' || type === 'rain' || type === 'fan' ? pink : white * 0.43;
                 }
                 noiseNode = audioCtx.createBufferSource();
-                noiseNode.buffer = noiseBuffer;
+                noiseNode.buffer = buffer;
                 noiseNode.loop = true;
                 gainNode = audioCtx.createGain();
-                gainNode.gain.value = 0.08;
-                noiseNode.connect(gainNode);
+                gainNode.gain.value = Number(document.getElementById('ambient-volume').value) / 100 * 0.19;
+                if (type === 'rain' || type === 'fan' || type === 'ocean') {
+                    ambientFilter = audioCtx.createBiquadFilter();
+                    ambientFilter.type = type === 'fan' ? 'lowpass' : 'bandpass';
+                    ambientFilter.frequency.value = type === 'rain' ? 1150 : type === 'fan' ? 360 : 260;
+                    ambientFilter.Q.value = type === 'rain' ? 0.28 : 0.6;
+                    noiseNode.connect(ambientFilter);
+                    ambientFilter.connect(gainNode);
+                } else {
+                    noiseNode.connect(gainNode);
+                }
+                if (type === 'ocean' || type === 'fan') {
+                    ambientLfo = audioCtx.createOscillator();
+                    ambientLfo.frequency.value = type === 'ocean' ? 0.10 : 0.26;
+                    ambientLfoGain = audioCtx.createGain();
+                    ambientLfoGain.gain.value = gainNode.gain.value * (type === 'ocean' ? 0.65 : 0.13);
+                    gainNode.gain.value *= type === 'ocean' ? 0.7 : 0.9;
+                    ambientLfo.connect(ambientLfoGain);
+                    ambientLfoGain.connect(gainNode.gain);
+                    ambientLfo.start();
+                }
                 gainNode.connect(audioCtx.destination);
-                noiseNode.start(0);
-
+                noiseNode.start();
+                audioCtx.resume();
                 isAmbientPlaying = true;
-                btn.textContent = 'Ligado';
-                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950 transition';
-                box.className = 'w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center';
-            } catch (e) {
-                showToast('Não foi possível iniciar o áudio neste navegador.', 'error');
+                updateAmbientUI();
+            } catch (error) {
+                stopAmbientAudio();
+                showToast('Não foi possível iniciar o som neste navegador.', 'error');
             }
         }
+
+        // Restaura apenas preferências do player, sem tocar automaticamente.
+        document.addEventListener('DOMContentLoaded', () => {
+            const sound = localStorage.getItem('bookverso_ambient_sound');
+            const volume = localStorage.getItem('bookverso_ambient_volume');
+            const select = document.getElementById('ambient-sound-select');
+            const slider = document.getElementById('ambient-volume');
+            if (select && sound && [...select.options].some(o => o.value === sound)) select.value = sound;
+            updateYouTubePanel();
+            if (slider && volume !== null && Number.isFinite(Number(volume))) {
+                slider.value = Math.max(0, Math.min(100, Number(volume)));
+                document.getElementById('ambient-volume-label').textContent = slider.value + '%';
+            }
+        });
 
         // ==========================================
         // MÓDULO 4: INSIGHTS (SEGUNDO CÉREBRO COSMOS, PLANO DE AÇÃO & PAHA)
