@@ -366,7 +366,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-white">Sessão de Leitura</h2>
-                        <p class="text-sm text-slate-400">Cronometre seu foco em tempo real ou registre uma leitura passada.</p>
+                        <p class="text-sm text-slate-400">Use cronômetro ou Pomodoro com alarme no fim, ou registre uma leitura passada.</p>
                     </div>
                     <!-- Mode Switcher -->
                     <div class="inline-flex p-1 rounded-xl bg-slate-800 border border-slate-700 self-start">
@@ -385,6 +385,23 @@
                                 <!-- Preenchido via JS -->
                             </select>
                             <p id="timer-book-meta" class="text-xs text-slate-400 mt-1.5">Página atual: 0 de 0</p>
+                        </div>
+
+                        <!-- Modos Cronômetro / Pomodoro -->
+                        <div class="text-left bg-slate-900/70 border border-slate-700 rounded-xl p-4 space-y-3">
+                            <label for="reading-timer-mode" class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Tipo de contador</label>
+                            <select id="reading-timer-mode" onchange="onReadingTimerSettingsChange()" class="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm">
+                                <option value="stopwatch">Cronômetro (contagem crescente)</option>
+                                <option value="pomodoro">Pomodoro (contagem regressiva + alarme)</option>
+                            </select>
+                            <div id="pomodoro-settings" class="hidden space-y-2">
+                                <label for="pomodoro-minutes" class="block text-xs font-semibold text-slate-300">Duração da leitura (minutos)</label>
+                                <div class="flex gap-2 items-center">
+                                    <input id="pomodoro-minutes" type="number" inputmode="numeric" min="1" max="240" step="1" value="25" onchange="onReadingTimerSettingsChange()" class="w-24 px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm" />
+                                    <button type="button" onclick="previewPomodoroAlarm()" class="px-3 py-2.5 rounded-xl bg-slate-700 text-white text-xs font-semibold">Testar apito</button>
+                                </div>
+                                <p class="text-xs text-slate-400">Ao chegar a zero, o contador para e toca um aviso. Você pode registrar sua leitura em Finalizar.</p>
+                            </div>
                         </div>
 
                         <!-- Timer Display -->
@@ -1112,6 +1129,11 @@
         let timerInterval = null;
         let timerSeconds = 0;
         let isTimerRunning = false;
+        let readingTimerMode = 'stopwatch';
+        let pomodoroDurationSeconds = 25 * 60;
+        let timerTickAt = 0;
+        let timerElapsedAtStart = 0;
+        let alarmAudioContext = null;
 
         // Player de som gerado por Web Audio API; não altera dados existentes.
         let audioCtx = null;
@@ -1784,10 +1806,73 @@
         }
 
         function updateTimerDisplay() {
-            document.getElementById('timer-display').textContent = formatHMS(timerSeconds);
+            const remaining = Math.max(0, pomodoroDurationSeconds - timerSeconds);
+            const shownSeconds = readingTimerMode === 'pomodoro' ? remaining : timerSeconds;
+            document.getElementById('timer-display').textContent = formatHMS(shownSeconds);
             const m = calculateMetrics();
             const estPages = Math.round((timerSeconds / 3600) * m.avgSpeed);
             document.getElementById('timer-est-pages').textContent = `${estPages} págs`;
+        }
+
+        function onReadingTimerSettingsChange() {
+            if (isTimerRunning || timerSeconds > 0) {
+                document.getElementById('reading-timer-mode').value = readingTimerMode;
+                document.getElementById('pomodoro-minutes').value = Math.round(pomodoroDurationSeconds / 60);
+                showToast('Pause e zere o contador para mudar o modo ou a duração.', 'info');
+                return;
+            }
+            readingTimerMode = document.getElementById('reading-timer-mode').value;
+            const minutesInput = document.getElementById('pomodoro-minutes');
+            const minutes = Math.min(240, Math.max(1, Math.round(Number(minutesInput.value) || 25)));
+            minutesInput.value = minutes;
+            pomodoroDurationSeconds = minutes * 60;
+            localStorage.setItem('bookverso_timer_mode', readingTimerMode);
+            localStorage.setItem('bookverso_pomodoro_minutes', String(minutes));
+            document.getElementById('pomodoro-settings').classList.toggle('hidden', readingTimerMode !== 'pomodoro');
+            document.getElementById('timer-status-label').textContent = readingTimerMode === 'pomodoro' ? 'Pomodoro pronto' : 'Pronto para iniciar';
+            updateTimerDisplay();
+        }
+
+        function previewPomodoroAlarm() {
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) throw new Error('AudioContext indisponível');
+                if (!alarmAudioContext || alarmAudioContext.state === 'closed') alarmAudioContext = new Ctx();
+                alarmAudioContext.resume();
+                const now = alarmAudioContext.currentTime + 0.05;
+                [0, 0.42, 0.84].forEach((delay) => {
+                    const oscillator = alarmAudioContext.createOscillator();
+                    const gain = alarmAudioContext.createGain();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, now + delay);
+                    gain.gain.setValueAtTime(0.0001, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.35, now + delay + 0.025);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.29);
+                    oscillator.connect(gain);
+                    gain.connect(alarmAudioContext.destination);
+                    oscillator.start(now + delay);
+                    oscillator.stop(now + delay + 0.30);
+                });
+            } catch (_) {
+                showToast('Seu navegador não permitiu reproduzir o apito.', 'error');
+            }
+        }
+
+        function finishPomodoroCountdown() {
+            timerSeconds = pomodoroDurationSeconds;
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            timerInterval = null;
+            updateTimerDisplay();
+            document.getElementById('timer-status-label').textContent = 'Tempo encerrado! Finalize sua leitura.';
+            document.getElementById('btn-timer-pause').classList.add('hidden');
+            document.getElementById('btn-timer-start').classList.add('hidden');
+            document.getElementById('btn-timer-finish').classList.remove('hidden');
+            document.getElementById('btn-timer-reset').classList.remove('hidden');
+            document.getElementById('desktop-timer-dot')?.classList.add('hidden');
+            document.getElementById('mobile-timer-dot')?.classList.add('hidden');
+            previewPomodoroAlarm();
+            showToast('⏰ Pomodoro concluído! Registre sua leitura.', 'success');
         }
 
         function startTimer() {
@@ -1796,7 +1881,23 @@
                 return;
             }
             if (isTimerRunning) return;
+            if (readingTimerMode === 'pomodoro' && timerSeconds >= pomodoroDurationSeconds) {
+                showToast('O Pomodoro terminou. Finalize ou reinicie a sessão.', 'info');
+                return;
+            }
+            // Desbloqueia o áudio do alarme durante um gesto do usuário, exigência de alguns celulares.
+            if (readingTimerMode === 'pomodoro') {
+                try {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (Ctx) {
+                        if (!alarmAudioContext || alarmAudioContext.state === 'closed') alarmAudioContext = new Ctx();
+                        alarmAudioContext.resume();
+                    }
+                } catch (_) {}
+            }
             isTimerRunning = true;
+            timerElapsedAtStart = timerSeconds;
+            timerTickAt = Date.now();
             document.getElementById('timer-status-label').textContent = 'Lendo em foco...';
             document.getElementById('btn-timer-start').classList.add('hidden');
             document.getElementById('btn-timer-pause').classList.remove('hidden');
@@ -1806,14 +1907,23 @@
             document.getElementById('mobile-timer-dot')?.classList.remove('hidden');
 
             timerInterval = setInterval(() => {
-                timerSeconds++;
+                // Usa relógio real para evitar atraso se o celular desacelerar a aba.
+                timerSeconds = timerElapsedAtStart + Math.floor((Date.now() - timerTickAt) / 1000);
+                if (readingTimerMode === 'pomodoro' && timerSeconds >= pomodoroDurationSeconds) {
+                    finishPomodoroCountdown();
+                    return;
+                }
                 updateTimerDisplay();
-            }, 1000);
+            }, 250);
         }
 
         function pauseTimer() {
+            if (isTimerRunning) timerSeconds = timerElapsedAtStart + Math.floor((Date.now() - timerTickAt) / 1000);
+            if (readingTimerMode === 'pomodoro') timerSeconds = Math.min(timerSeconds, pomodoroDurationSeconds);
             isTimerRunning = false;
             clearInterval(timerInterval);
+            timerInterval = null;
+            updateTimerDisplay();
             document.getElementById('timer-status-label').textContent = 'Pausado';
             document.getElementById('btn-timer-pause').classList.add('hidden');
             document.getElementById('btn-timer-start').classList.remove('hidden');
@@ -1825,7 +1935,7 @@
             pauseTimer();
             timerSeconds = 0;
             updateTimerDisplay();
-            document.getElementById('timer-status-label').textContent = 'Pronto para iniciar';
+            document.getElementById('timer-status-label').textContent = readingTimerMode === 'pomodoro' ? 'Pomodoro pronto' : 'Pronto para iniciar';
             document.getElementById('btn-timer-finish').classList.add('hidden');
             document.getElementById('btn-timer-reset').classList.add('hidden');
         }
@@ -2819,6 +2929,10 @@
         // Inicialização no carregamento da página
         window.onload = function() {
             loadState();
+            const savedMode = localStorage.getItem('bookverso_timer_mode');
+            document.getElementById('reading-timer-mode').value = savedMode === 'pomodoro' ? 'pomodoro' : 'stopwatch';
+            document.getElementById('pomodoro-minutes').value = localStorage.getItem('bookverso_pomodoro_minutes') || '25';
+            onReadingTimerSettingsChange();
             switchTab('inicio');
         };
     </script>
